@@ -25,6 +25,7 @@ const current_user_1 = require("../../application/current-user");
 const users_query_repository_1 = require("../../users/query-repository/users-query-repository");
 const mongodb_1 = require("mongodb");
 const auth_repository_1 = require("../auth-repository/auth-repository");
+const users_router_1 = require("../../users/router/users-router");
 exports.authRouter = (0, express_1.Router)({});
 exports.authRouter.get('/me', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -70,5 +71,28 @@ exports.authRouter.post('/login', (req, res) => __awaiter(void 0, void 0, void 0
     catch (error) {
         res.sendStatus(http_statuses_1.HTTP_STATUSES.SERVER_ERROR_500);
     }
+}));
+exports.authRouter.post('/registration', users_router_1.usersValidators, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    // try {
+    //     const user: UserCreateType = {
+    //     login: req.body.login,
+    //     email: req.body.email,
+    //     password: req.body.password,
+    //     createdAt: new Date().toISOString(),
+    // }
+    //     const response = await authService.authUser(user)
+    //     if (!response) {
+    //         res.sendStatus(HTTP_STATUSES.NOT_AUTH_401)
+    //         return
+    //     }
+    //     const user = await authRepositories.getUserIdByAutData(authData)
+    //     if(user){
+    //
+    //         const token = await jwtService.createJWT(user._id)
+    //         res.send({accessToken: token})
+    //     }
+    // } catch (error) {
+    //     res.sendStatus(HTTP_STATUSES.SERVER_ERROR_500)
+    // }
 }));
 //# sourceMappingURL=auth-router.js.map

@@ -22,7 +22,7 @@ exports.usersQueryRepository = {
             let users = yield db_1.usersCollection.find(findQuery).sort(sortQuery).skip(skip).limit(limit).toArray();
             const allUsers = yield db_1.usersCollection.find(findQuery).sort(sortQuery).toArray();
             let pagesCount = Math.ceil(allUsers.length / newPageSize);
-            const fixArrayIds = users.map((user => this.__changeIdFormat(user)));
+            const fixArrayIds = users.map((user => this.__changeUserFormat(user)));
             return {
                 "pagesCount": pagesCount,
                 "page": newPageNumber,
@@ -35,15 +35,13 @@ exports.usersQueryRepository = {
     getUserById(userId) {
         return __awaiter(this, void 0, void 0, function* () {
             const getUser = yield db_1.usersCollection.findOne({ _id: userId });
-            return getUser ? this.__changeIdFormat(getUser) : false;
+            return getUser ? this.__changeUserFormat(getUser) : false;
         });
     },
-    __changeIdFormat(obj) {
+    __changeUserFormat(obj) {
         obj.id = obj._id;
         delete obj._id;
-        delete obj.passwordSalt;
-        delete obj.passwordHash;
-        return obj;
+        return Object.assign(Object.assign({}, obj.accountData), obj.id);
     },
     __getUsersFindings(searchLoginTerm, searchEmailTerm) {
         let findQuery = {};

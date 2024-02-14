@@ -1,5 +1,18 @@
 import {ObjectId} from "mongodb";
-
+export type UserEmailEntityType = {
+    accountData:{
+        login: string
+        email: string
+        createdAt: string
+    }
+    passwordSalt: string
+    passwordHash: string
+    emailConfirmation:{
+        confirmationCode: string
+        expirationDate: string
+    }
+    isConfirmed: boolean
+}
 export type UserEntityType = {
     _id: ObjectId
     login: string

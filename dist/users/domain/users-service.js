@@ -13,14 +13,48 @@ exports.usersService = void 0;
 const users_repository_1 = require("../repository/users-repository");
 const bcrypt = require('bcrypt');
 exports.usersService = {
-    createUser(user) {
+    createUser(user, isReqFromSuperAdmin) {
         return __awaiter(this, void 0, void 0, function* () {
             const passwordSalt = yield bcrypt.genSalt(10);
             const passwordHash = yield this.__generateHash(user.password, passwordSalt);
             let changeUserData = Object.assign({}, user);
             delete changeUserData.password;
-            const userHashData = Object.assign(Object.assign({}, changeUserData), { 'passwordSalt': passwordSalt, 'passwordHash': passwordHash });
-            const userId = yield users_repository_1.usersRepositories.createUser(userHashData);
+            if (isReqFromSuperAdmin) {
+                const userEmailEntity = {
+                    accountData: {
+                        login: changeUserData.login,
+                        email: changeUserData.email,
+                        createdAt: new Date().toISOString(),
+                    },
+                    passwordSalt,
+                    passwordHash,
+                    emailConfirmation: {
+                        confirmationCode: 'superadmin',
+                        expirationDate: 'superadmin'
+                    },
+                    isConfirmed: isReqFromSuperAdmin
+                };
+                const userId = yield users_repository_1.usersRepositories.createUser(userEmailEntity);
+                if (!userId) {
+                    return false;
+                }
+                return userId;
+            }
+            const userEmailEntity = {
+                accountData: {
+                    login: changeUserData.login,
+                    email: changeUserData.email,
+                    createdAt: new Date().toISOString(),
+                },
+                passwordSalt,
+                passwordHash,
+                emailConfirmation: {
+                    confirmationCode: 'notsuperadmin',
+                    expirationDate: 'notsuperadmin'
+                },
+                isConfirmed: false
+            };
+            const userId = yield users_repository_1.usersRepositories.createUser(userEmailEntity);
             if (!userId) {
                 return false;
             }

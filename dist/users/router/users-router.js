@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.usersRouter = void 0;
+exports.usersRouter = exports.usersValidators = void 0;
 const express_1 = require("express");
 const http_statuses_1 = require("../../common/constants/http-statuses");
 const mongodb_1 = require("mongodb");
@@ -19,7 +19,7 @@ const users_service_1 = require("../domain/users-service");
 const users_query_repository_1 = require("../query-repository/users-query-repository");
 const auth_validation_1 = require("../../validation/auth-validation");
 const query_data_1 = require("../../common/custom-methods/query-data");
-const usersValidators = [
+exports.usersValidators = [
     auth_validation_1.authorizationMiddleware,
     users_validation_1.usersLoginValidation,
     users_validation_1.usersPasswordValidation,
@@ -40,15 +40,15 @@ exports.usersRouter.get('/', auth_validation_1.authorizationMiddleware, (req, re
         res.sendStatus(http_statuses_1.HTTP_STATUSES.SERVER_ERROR_500);
     }
 }));
-exports.usersRouter.post('/', ...usersValidators, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.usersRouter.post('/', ...exports.usersValidators, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        const isReqFromSuperAdmin = true;
         const user = {
             login: req.body.login,
             email: req.body.email,
             password: req.body.password,
-            createdAt: new Date().toISOString(),
         };
-        const response = yield users_service_1.usersService.createUser(user);
+        const response = yield users_service_1.usersService.createUser(user, isReqFromSuperAdmin);
         if (response) {
             const createdBlog = yield users_query_repository_1.usersQueryRepository.getUserById(response);
             res.status(http_statuses_1.HTTP_STATUSES.CREATED_201).send(createdBlog);

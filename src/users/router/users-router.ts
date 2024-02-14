@@ -11,7 +11,7 @@ import {
 
 } from "../validation/users-validation";
 import {blogIdValidation, inputValidationMiddleware} from "../../validation/blogs-validation";
-import {UserCreateType, UserViewType} from "../types/user-types";
+import {UserCreateType, UserEmailEntityType, UserInputModelType, UserViewType} from "../types/user-types";
 import {usersService} from "../domain/users-service";
 import {usersRepositories} from "../repository/users-repository";
 import {usersQueryRepository} from "../query-repository/users-query-repository";
@@ -19,7 +19,7 @@ import {authorizationMiddleware} from "../../validation/auth-validation";
 import {blogsRouter} from "../../blogs/router/blogs-router";
 import {getQueryData} from "../../common/custom-methods/query-data";
 
-const usersValidators = [
+export const usersValidators = [
     authorizationMiddleware,
     usersLoginValidation,
     usersPasswordValidation,
@@ -51,13 +51,13 @@ usersRouter.post('/',
     ...usersValidators,
     async (req: Request, res: Response) => {
         try {
-            const user: UserCreateType = {
+            const isReqFromSuperAdmin = true
+            const user: UserInputModelType = {
                 login: req.body.login,
                 email: req.body.email,
                 password: req.body.password,
-                createdAt: new Date().toISOString(),
             }
-            const response:  ObjectId | false = await usersService.createUser(user)
+            const response:  ObjectId | false = await usersService.createUser(user, isReqFromSuperAdmin)
             if (response) {
                 const createdBlog: UserViewType | false = await usersQueryRepository.getUserById(response)
                 res.status(HTTP_STATUSES.CREATED_201).send(createdBlog)

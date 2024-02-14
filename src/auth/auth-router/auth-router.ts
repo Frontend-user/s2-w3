@@ -19,6 +19,8 @@ import {usersService} from "../../users/domain/users-service";
 import {usersQueryRepository} from "../../users/query-repository/users-query-repository";
 import {ObjectId} from "mongodb";
 import {authRepositories} from "../auth-repository/auth-repository";
+import {usersValidators} from "../../users/router/users-router";
+import {UserCreateType} from "../../users/types/user-types";
 
 export const authRouter = Router({})
 
@@ -73,5 +75,33 @@ authRouter.post('/login',
         }
 
     })
+
+authRouter.post('/registration',
+    usersValidators,
+    async (req: Request, res: Response) => {
+        // try {
+        //     const user: UserCreateType = {
+        //     login: req.body.login,
+        //     email: req.body.email,
+        //     password: req.body.password,
+        //     createdAt: new Date().toISOString(),
+        // }
+        //     const response = await authService.authUser(user)
+        //     if (!response) {
+        //         res.sendStatus(HTTP_STATUSES.NOT_AUTH_401)
+        //         return
+        //     }
+        //     const user = await authRepositories.getUserIdByAutData(authData)
+        //     if(user){
+        //
+        //         const token = await jwtService.createJWT(user._id)
+        //         res.send({accessToken: token})
+        //     }
+        // } catch (error) {
+        //     res.sendStatus(HTTP_STATUSES.SERVER_ERROR_500)
+        // }
+
+    })
+
 
 
