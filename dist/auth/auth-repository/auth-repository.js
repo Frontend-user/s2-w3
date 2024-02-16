@@ -11,24 +11,53 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.authRepositories = void 0;
 const db_1 = require("../../db");
+const nodemailer_service_1 = require("../../application/nodemailer-service");
+const uuid_1 = require("uuid");
 exports.authRepositories = {
     authUser(auth) {
         return __awaiter(this, void 0, void 0, function* () {
-            const response = yield db_1.usersCollection.findOne({ $or: [{ login: auth.loginOrEmail }, { email: auth.loginOrEmail }] });
+            const response = yield db_1.usersCollection.findOne({ $or: [{ 'accountData.login': auth.loginOrEmail }, { 'accountData.email': auth.loginOrEmail }] });
             return !!response;
         });
     },
     getUserHash(auth) {
         return __awaiter(this, void 0, void 0, function* () {
-            const response = yield db_1.usersCollection.findOne({ $or: [{ login: auth.loginOrEmail }, { email: auth.loginOrEmail }] });
+            const response = yield db_1.usersCollection.findOne({ $or: [{ 'accountData.login': auth.loginOrEmail }, { 'accountData.email': auth.loginOrEmail }] });
             return response ? response : false;
         });
     },
     getUserIdByAutData(auth) {
         return __awaiter(this, void 0, void 0, function* () {
-            const response = yield db_1.usersCollection.findOne({ $or: [{ login: auth.loginOrEmail }, { email: auth.loginOrEmail }] });
+            const response = yield db_1.usersCollection.findOne({ $or: [{ 'accountData.login': auth.loginOrEmail }, { 'accountData.email': auth.loginOrEmail }] });
             return response ? response : false;
         });
-    }
+    },
+    getConfirmCode(code) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const getUser = yield db_1.usersCollection.findOne({ 'emailConfirmation.confirmationCode': code });
+            if (getUser) {
+                const respUpdate = yield db_1.usersCollection.updateOne({ _id: getUser._id }, { $set: { isConfirmed: true } });
+                return respUpdate.matchedCount === 1;
+            }
+            return false;
+        });
+    },
+    registrationEmailResending(email) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const getUser = yield db_1.usersCollection.findOne({ 'accountData.email': email });
+            if (getUser) {
+                const newCode = (0, uuid_1.v4)();
+                const respUpdate = yield db_1.usersCollection.updateOne({ _id: getUser._id }, { $set: { 'emailConfirmation.confirmationCode': newCode } });
+                if (respUpdate.matchedCount === 1) {
+                    yield nodemailer_service_1.nodemailerService.send(newCode, email);
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            }
+            return false;
+        });
+    },
 };
 //# sourceMappingURL=auth-repository.js.map

@@ -28,7 +28,7 @@ blogsRouter.get('/',
     async (req: Request, res: Response) => {
         try {
             let {sortBy, sortDirection, pageNumber, pageSize} = getQueryData(req)
-            let searchNameTerm = req.query.searchNameTerm ? String(req.query.searchNameTerm): undefined
+            let searchNameTerm = req.query.SearchNameTerm ? String(req.query.SearchNameTerm): undefined
 
             const blogs = await blogsQueryRepository.getBlogs(searchNameTerm, sortBy, sortDirection, pageNumber,pageSize)
             res.status(HTTP_STATUSES.OK_200).send(blogs)

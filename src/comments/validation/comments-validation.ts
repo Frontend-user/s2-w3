@@ -50,10 +50,7 @@ export const commentPostIdExistValidation = param('postId').custom(async (value,
     field: 'postId'
 })
 export const haveAccesForUpdate =  param('commentId').custom(async (value, {req}) => {
-    console.log(value,'value')
     const comment: any | boolean = await commentQueryRepository.getCommentById(new ObjectId(value))
-    console.log(comment,'comment')
-    console.log(currentUser,'currentUser')
         if (currentUser.userLogin === comment.commentatorInfo.userLogin && currentUser.userId === comment.commentatorInfo.userId ) {
                 return true
         } else {

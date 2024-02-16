@@ -1,4 +1,5 @@
 import {currentUser} from "./current-user";
+const bcrypt = require('bcrypt');
 
 const jwt = require('jsonwebtoken')
 export const jwtService = {
@@ -14,6 +15,18 @@ export const jwtService = {
             console.error('Ошибка при проверке токена:', error);
             return
         }
+    },
+
+    async generateSalt(saltNumber:number){
+        return await bcrypt.genSalt(saltNumber)
+    },
+
+    async generateHash(password: string, salt: string) {
+        const hash = await bcrypt.hash(password, salt)
+        if (hash) {
+            return hash
+        }
+        return false
     },
 }
 

@@ -56,10 +56,7 @@ exports.commentPostIdExistValidation = (0, express_validator_1.param)('postId').
     field: 'postId'
 });
 exports.haveAccesForUpdate = (0, express_validator_1.param)('commentId').custom((value, { req }) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log(value, 'value');
     const comment = yield comment_query_repository_1.commentQueryRepository.getCommentById(new mongodb_1.ObjectId(value));
-    console.log(comment, 'comment');
-    console.log(current_user_1.currentUser, 'currentUser');
     if (current_user_1.currentUser.userLogin === comment.commentatorInfo.userLogin && current_user_1.currentUser.userId === comment.commentatorInfo.userId) {
         return true;
     }

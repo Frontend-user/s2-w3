@@ -6,6 +6,7 @@ import {BlogUpdateType} from "../../src/common/types/blog-type";
 import {blogsTestManager} from "../utils/blogsTestManager";
 import {UserCreateType, UserInputModelType} from "../../src/users/types/user-types";
 import {AuthType} from "../../src/auth/auth-types/auth-types";
+import {ObjectId} from "mongodb";
 
 describe('/Users', () => {
 
@@ -71,7 +72,7 @@ describe('/Users', () => {
         const response = await request(app)
             .get(Routes.users)
             .set('Authorization', `${token}`)
-            .query({searchNameTerm:'3',pageNumber: 2, pageSize:3,sortBy: 'login', sortDirection: 'desc'})
+            .query({searchLoginTerm:'3',pageNumber: 2, pageSize:3,sortBy: 'login', sortDirection: 'desc'})
         const responseBlogs = response.body.items
         expect(responseBlogs.length).toEqual(3)
         expect(responseBlogs[0].login).toEqual('login:36')

@@ -9,9 +9,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.authRouter = void 0;
+exports.authRouter = exports.registrationValidators = void 0;
 const users_validation_1 = require("../../users/validation/users-validation");
 const blogs_validation_1 = require("../../validation/blogs-validation");
+exports.registrationValidators = [
+    users_validation_1.usersLoginValidation,
+    users_validation_1.usersPasswordValidation,
+    users_validation_1.usersEmailValidation,
+    users_validation_1.userEmailExistValidation,
+    users_validation_1.userLoginExistValidation,
+    blogs_validation_1.inputValidationMiddleware,
+];
 const authValidators = [
     users_validation_1.usersPasswordValidation,
     users_validation_1.authLoginOrEmailValidation,
@@ -25,7 +33,6 @@ const current_user_1 = require("../../application/current-user");
 const users_query_repository_1 = require("../../users/query-repository/users-query-repository");
 const mongodb_1 = require("mongodb");
 const auth_repository_1 = require("../auth-repository/auth-repository");
-const users_router_1 = require("../../users/router/users-router");
 exports.authRouter = (0, express_1.Router)({});
 exports.authRouter.get('/me', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -72,27 +79,48 @@ exports.authRouter.post('/login', (req, res) => __awaiter(void 0, void 0, void 0
         res.sendStatus(http_statuses_1.HTTP_STATUSES.SERVER_ERROR_500);
     }
 }));
-exports.authRouter.post('/registration', users_router_1.usersValidators, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    // try {
-    //     const user: UserCreateType = {
-    //     login: req.body.login,
-    //     email: req.body.email,
-    //     password: req.body.password,
-    //     createdAt: new Date().toISOString(),
-    // }
-    //     const response = await authService.authUser(user)
-    //     if (!response) {
-    //         res.sendStatus(HTTP_STATUSES.NOT_AUTH_401)
-    //         return
-    //     }
-    //     const user = await authRepositories.getUserIdByAutData(authData)
-    //     if(user){
-    //
-    //         const token = await jwtService.createJWT(user._id)
-    //         res.send({accessToken: token})
-    //     }
-    // } catch (error) {
-    //     res.sendStatus(HTTP_STATUSES.SERVER_ERROR_500)
-    // }
+exports.authRouter.post('/registration', ...exports.registrationValidators, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const userInputData = {
+            login: req.body.login,
+            email: req.body.email,
+            password: req.body.password,
+        };
+        const response = yield auth_service_1.authService.registration(userInputData);
+        if (!response) {
+            res.sendStatus(http_statuses_1.HTTP_STATUSES.SOMETHING_WRONG_400);
+            return;
+        }
+        res.send(204);
+    }
+    catch (error) {
+        res.sendStatus(http_statuses_1.HTTP_STATUSES.SERVER_ERROR_500);
+    }
+}));
+exports.authRouter.post('/registration-confirmation', users_validation_1.checkCodeConfirmation, users_validation_1.checkCodeExist, blogs_validation_1.inputValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const response = yield auth_service_1.authService.registrationConfirm(req.body.code);
+        if (!response) {
+            res.sendStatus(http_statuses_1.HTTP_STATUSES.SOMETHING_WRONG_400);
+            return;
+        }
+        res.send(204);
+    }
+    catch (error) {
+        res.sendStatus(http_statuses_1.HTTP_STATUSES.SERVER_ERROR_500);
+    }
+}));
+exports.authRouter.post('/registration-email-resending', users_validation_1.checkEmailConfirmation, users_validation_1.userEmailRecendingExistValidation, blogs_validation_1.inputValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const response = yield auth_service_1.authService.registrationEmailResending(req.body.email);
+        if (!response) {
+            res.sendStatus(http_statuses_1.HTTP_STATUSES.SOMETHING_WRONG_400);
+            return;
+        }
+        res.send(204);
+    }
+    catch (error) {
+        res.sendStatus(http_statuses_1.HTTP_STATUSES.SERVER_ERROR_500);
+    }
 }));
 //# sourceMappingURL=auth-router.js.map

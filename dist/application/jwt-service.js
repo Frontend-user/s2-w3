@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.jwtService = void 0;
+const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 exports.jwtService = {
     createJWT(userId) {
@@ -27,6 +28,20 @@ exports.jwtService = {
                 console.error('Ошибка при проверке токена:', error);
                 return;
             }
+        });
+    },
+    generateSalt(saltNumber) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield bcrypt.genSalt(saltNumber);
+        });
+    },
+    generateHash(password, salt) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const hash = yield bcrypt.hash(password, salt);
+            if (hash) {
+                return hash;
+            }
+            return false;
         });
     },
 };

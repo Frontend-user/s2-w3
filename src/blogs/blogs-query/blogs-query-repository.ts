@@ -20,7 +20,6 @@ export const blogsQueryRepository = {
 
 
         const fixArrayIds: BlogViewType[] = blogs.map((item => changeIdFormat(item)))
-
         const response: Pagination<BlogViewType[]> = {
             "pagesCount": pagesCount,
             "page": newPageNumber,

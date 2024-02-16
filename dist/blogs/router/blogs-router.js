@@ -31,7 +31,7 @@ exports.blogsRouter = (0, express_1.Router)({});
 exports.blogsRouter.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         let { sortBy, sortDirection, pageNumber, pageSize } = (0, query_data_1.getQueryData)(req);
-        let searchNameTerm = req.query.searchNameTerm ? String(req.query.searchNameTerm) : undefined;
+        let searchNameTerm = req.query.SearchNameTerm ? String(req.query.SearchNameTerm) : undefined;
         const blogs = yield blogs_query_repository_1.blogsQueryRepository.getBlogs(searchNameTerm, sortBy, sortDirection, pageNumber, pageSize);
         res.status(http_statuses_1.HTTP_STATUSES.OK_200).send(blogs);
     }

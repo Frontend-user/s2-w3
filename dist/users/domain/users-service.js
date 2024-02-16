@@ -11,48 +11,27 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.usersService = void 0;
 const users_repository_1 = require("../repository/users-repository");
+const jwt_service_1 = require("../../application/jwt-service");
 const bcrypt = require('bcrypt');
 exports.usersService = {
     createUser(user, isReqFromSuperAdmin) {
         return __awaiter(this, void 0, void 0, function* () {
-            const passwordSalt = yield bcrypt.genSalt(10);
-            const passwordHash = yield this.__generateHash(user.password, passwordSalt);
-            let changeUserData = Object.assign({}, user);
-            delete changeUserData.password;
-            if (isReqFromSuperAdmin) {
-                const userEmailEntity = {
-                    accountData: {
-                        login: changeUserData.login,
-                        email: changeUserData.email,
-                        createdAt: new Date().toISOString(),
-                    },
-                    passwordSalt,
-                    passwordHash,
-                    emailConfirmation: {
-                        confirmationCode: 'superadmin',
-                        expirationDate: 'superadmin'
-                    },
-                    isConfirmed: isReqFromSuperAdmin
-                };
-                const userId = yield users_repository_1.usersRepositories.createUser(userEmailEntity);
-                if (!userId) {
-                    return false;
-                }
-                return userId;
-            }
+            const passwordSalt = yield jwt_service_1.jwtService.generateSalt(10);
+            const passwordHash = yield jwt_service_1.jwtService.generateHash(user.password, passwordSalt);
             const userEmailEntity = {
                 accountData: {
-                    login: changeUserData.login,
-                    email: changeUserData.email,
+                    login: user.login,
+                    email: user.email,
                     createdAt: new Date().toISOString(),
                 },
                 passwordSalt,
                 passwordHash,
                 emailConfirmation: {
-                    confirmationCode: 'notsuperadmin',
-                    expirationDate: 'notsuperadmin'
+                    confirmationCode: 'superadmin',
+                    expirationDate: 'superadmin'
                 },
-                isConfirmed: false
+                isConfirmed: isReqFromSuperAdmin,
+                isCreatedFromAdmin: true
             };
             const userId = yield users_repository_1.usersRepositories.createUser(userEmailEntity);
             if (!userId) {
@@ -64,15 +43,6 @@ exports.usersService = {
     deleteUser(id) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield users_repository_1.usersRepositories.deleteUser(id);
-        });
-    },
-    __generateHash(password, salt) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const hash = yield bcrypt.hash(password, salt);
-            if (hash) {
-                return hash;
-            }
-            return false;
         });
     },
 };
